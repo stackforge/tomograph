@@ -1,8 +1,8 @@
 tomograph
 =========
 
-A library for sending trace information to metrics backends like
-[Zipkin][zipkin] and [Statsd][statsd].
+A library to help distributed applications send trace information to
+metrics backends like [Zipkin][zipkin] and [Statsd][statsd].
 
 Data Model
 ----------
