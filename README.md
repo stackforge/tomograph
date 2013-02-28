@@ -21,7 +21,7 @@ metric, and each note gets emitted individually as a counter metric.
 For example, here is a basic client/server interaction.  It is one
 trace, with two spans, each with two notes -- their beginning and end:
 
-![zipkin client server](https://raw.github.com/timjr/tomograph/raw/master/doc/screenshots/client-server-zipkin.png)
+![zipkin client server](https://raw.github.com/timjr/tomograph/master/doc/screenshots/client-server-zipkin.png)
 
 This is the same data as it would be viewed in using the statsd
 backend with graphite:
@@ -112,7 +112,7 @@ Here is a slightly more involved example -- a glance image list
 command in [Openstack][openstack].  It uses SQL statement tracing and
 the tomograph middleware:
 
-![zipkin glance image list](https://raw.github.com/timjr/tomograph/raw/master/doc/screenshots/zipkin-glance-image-list.png)
+![zipkin glance image list](https://raw.github.com/timjr/tomograph/master/doc/screenshots/zipkin-glance-image-list.png)
 
 
 [openstack]: http://www.openstack.org/
