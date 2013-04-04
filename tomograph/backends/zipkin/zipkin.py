@@ -28,6 +28,7 @@ import traceback
 
 
 
+
 def send(span):
     tsocket = TSocket.TSocket(config.zipkin_host, config.zipkin_port)
     transport = TTransport.TFramedTransport(tsocket)
@@ -41,7 +42,7 @@ def send(span):
         except:
             print >>sys.stderr, 'host resolution error: ', traceback.format_exc()
             ip = '0.0.0.0'
-        return zipkin_thrift.Endpoint(ipv4 = IPy.IP(ip).int(),
+        return zipkin_thrift.Endpoint(ipv4 = ip_to_i32(ip),
                                       port = note.port,
                                       service_name = note.service_name)
     def annotation(note):
@@ -61,3 +62,7 @@ def send(span):
     logentry = scribe.LogEntry('zipkin', base64.b64encode(out.getvalue()))
     client.Log([logentry])
     transport.close()
+
+def ip_to_i32(ip_str):
+    """convert an ip address from a string to a signed 32-bit number"""
+    return -0x80000000 + (IPy.IP(ip_str).int() & 0x7fffffff)
