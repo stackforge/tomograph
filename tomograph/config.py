@@ -14,8 +14,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 enabled_backends = ['tomograph.backends.zipkin',
-                    'tomograph.backends.statsd',
-                    'tomograph.backends.log']
+                    #'tomograph.backends.statsd',
+                    #'tomograph.backends.log'
+                    ]
+#enabled_backends = []
 backend_modules = []
 
 def set_backends(backends):
@@ -44,9 +46,17 @@ def get_backends():
         set_backends(enabled_backends)
     return backend_modules
     
-zipkin_host = '172.16.77.141'
-zipkin_port = 9410
+zipkin_host = '127.0.0.1'
+zipkin_port = 1463
 
-statsd_host = '172.16.77.141'
+# zipkin_port = 9410
+
+#statsd_host = '127.0.0.1'
+statsd_host = 'pairsscares.corp.gq1.yahoo.com'
 statsd_port = 8125
 
+zipkin_socket_timeout = 5.0
+zipkin_max_queue_length = 50000
+zipkin_target_write_size = 1000
+
+debug = False

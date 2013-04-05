@@ -9,8 +9,9 @@
 # License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 
-import zipkin_thrift
 from generated.scribe import scribe
+import sender
+import zipkin_thrift
 from thrift.transport import TTransport
 from thrift.transport import TSocket
 from thrift.protocol import TBinaryProtocol
@@ -25,20 +26,37 @@ import random
 import socket
 import sys
 import traceback
+import atexit
+import threading
 
+scribe_sender = sender.ScribeSender()
+atexit.register(scribe_sender.close)
 
+class Cache(object):
+    def __init__(self, thunk, size_limit=1000):
+        self._map = {}
+        self._thunk = thunk
+        self._size_limit = size_limit
+        self._lock = threading.Lock()
 
+    def get(self, k):
+        with self._lock:
+            if self._map.has_key(k):
+                return self._map[k]
+            else:
+                while len(self._map) >= self._size_limit:
+                    self._map.popitem()
+                v = self._thunk(k)
+                self._map[k] = v
+                return v
+
+hostname_cache = Cache(socket.gethostbyname)
 
 def send(span):
-    tsocket = TSocket.TSocket(config.zipkin_host, config.zipkin_port)
-    transport = TTransport.TFramedTransport(tsocket)
-    transport.open()
-    protocol = TBinaryProtocol.TBinaryProtocol(transport)
-    client = scribe.Client(protocol)
 
     def endpoint(note):
         try:
-            ip = socket.gethostbyname(note.address)
+            ip = hostname_cache.get(note.address)
         except:
             print >>sys.stderr, 'host resolution error: ', traceback.format_exc()
             ip = '0.0.0.0'
@@ -57,12 +75,11 @@ def send(span):
                                annotations = [annotation(n) for n in span.notes])
 
     out = StringIO.StringIO()
-    raw = TBinaryProtocol.TBinaryProtocol(out)
+    raw = TBinaryProtocol.TBinaryProtocolAccelerated(out)
     zspan.write(raw)
-    logentry = scribe.LogEntry('zipkin', base64.b64encode(out.getvalue()))
-    client.Log([logentry])
-    transport.close()
+    scribe_sender.send('zipkin', base64.b64encode(out.getvalue()))
 
 def ip_to_i32(ip_str):
     """convert an ip address from a string to a signed 32-bit number"""
     return -0x80000000 + (IPy.IP(ip_str).int() & 0x7fffffff)
+
