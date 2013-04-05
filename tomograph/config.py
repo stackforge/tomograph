@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 enabled_backends = ['tomograph.backends.zipkin',
                     'tomograph.backends.statsd',
                     'tomograph.backends.log']
-#enabled_backends = []
 backend_modules = []
 
 def set_backends(backends):
