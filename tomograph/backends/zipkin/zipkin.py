@@ -17,6 +17,7 @@ from thrift.transport import TSocket
 from thrift.protocol import TBinaryProtocol
 
 from tomograph import config
+from tomograph import cache
 
 import base64
 import StringIO
@@ -27,30 +28,11 @@ import socket
 import sys
 import traceback
 import atexit
-import threading
 
 scribe_sender = sender.ScribeSender()
 atexit.register(scribe_sender.close)
 
-class Cache(object):
-    def __init__(self, thunk, size_limit=1000):
-        self._map = {}
-        self._thunk = thunk
-        self._size_limit = size_limit
-        self._lock = threading.Lock()
-
-    def get(self, k):
-        with self._lock:
-            if self._map.has_key(k):
-                return self._map[k]
-            else:
-                while len(self._map) >= self._size_limit:
-                    self._map.popitem()
-                v = self._thunk(k)
-                self._map[k] = v
-                return v
-
-hostname_cache = Cache(socket.gethostbyname)
+hostname_cache = cache.Cache(socket.gethostbyname)
 
 def send(span):
 
