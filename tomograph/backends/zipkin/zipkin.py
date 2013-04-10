@@ -44,6 +44,7 @@ def send(span):
             ip = '0.0.0.0'
         return zipkin_thrift.Endpoint(ipv4 = ip_to_i32(ip),
                                       port = note.port,
+
                                       service_name = note.service_name)
     def annotation(note):
         return zipkin_thrift.Annotation(timestamp = int(note.time * 1e6),
@@ -55,13 +56,20 @@ def send(span):
                                name = span.name,
                                parent_id = span.parent_id,
                                annotations = [annotation(n) for n in span.notes])
-
+    print "zspan is {0}".format(zspan)
     out = StringIO.StringIO()
     raw = TBinaryProtocol.TBinaryProtocolAccelerated(out)
-    zspan.write(raw)
+    try:
+        zspan.write(raw)
+    except OverflowError:
+        traceback.print_exc()
     scribe_sender.send('zipkin', base64.b64encode(out.getvalue()))
 
 def ip_to_i32(ip_str):
     """convert an ip address from a string to a signed 32-bit number"""
-    return -0x80000000 + (IPy.IP(ip_str).int() & 0x7fffffff)
+    a = -0x80000000 + (IPy.IP(ip_str).int() & 0x7fffffff)
+    if not -2147483648 <= a <= 2147483647:
+        print "ARGARG {0}".format(a)
+    return a
+
 
