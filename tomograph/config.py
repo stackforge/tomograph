@@ -18,6 +18,18 @@ enabled_backends = ['tomograph.backends.zipkin',
                     'tomograph.backends.log']
 backend_modules = []
 
+zipkin_host = '127.0.0.1'
+zipkin_port = 1463
+
+statsd_host = 'pairsscares.corp.gq1.yahoo.com'
+statsd_port = 8125
+
+zipkin_socket_timeout = 5.0
+zipkin_max_queue_length = 50000
+zipkin_target_write_size = 1000
+
+debug = False
+
 def set_backends(backends):
     """
     Set the list of enabled backends.  Backend name should be the full
@@ -44,17 +56,3 @@ def get_backends():
         set_backends(enabled_backends)
     return backend_modules
     
-zipkin_host = '127.0.0.1'
-zipkin_port = 1463
-
-# zipkin_port = 9410
-
-#statsd_host = '127.0.0.1'
-statsd_host = 'pairsscares.corp.gq1.yahoo.com'
-statsd_port = 8125
-
-zipkin_socket_timeout = 5.0
-zipkin_max_queue_length = 50000
-zipkin_target_write_size = 1000
-
-debug = False

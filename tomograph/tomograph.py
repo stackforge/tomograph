@@ -103,13 +103,14 @@ def before_execute(name):
         port = conn.connection.connection.port
         #print >>sys.stderr, 'connection is {0}:{1}'.format(h, port)
         #print >>sys.stderr, 'sql statement is {0}'.format(clauseelement)
-        start(str(name) + 'db client', 'execute', h, port)
+        #start(str(name) + 'db client', 'execute', h, port)
     return handler
 
 def after_execute(name):
     # name isn't used, at least not yet...
     def handler(conn, clauseelement, multiparams, params, result):
-        stop('execute')
+        #stop('execute')
+        pass
     return handler
 
 ## http helpers
