@@ -1,2 +1,5 @@
 eventlet
 webob
+statsd
+IPy
+thrift
