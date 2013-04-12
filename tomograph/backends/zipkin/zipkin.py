@@ -43,8 +43,7 @@ def send(span):
             print >>sys.stderr, 'host resolution error: ', traceback.format_exc()
             ip = '0.0.0.0'
         return zipkin_thrift.Endpoint(ipv4 = ip_to_i32(ip),
-                                      port = note.port,
-
+                                      port = port_to_i16(note.port),
                                       service_name = note.service_name)
     def annotation(note):
         return zipkin_thrift.Annotation(timestamp = int(note.time * 1e6),
@@ -56,7 +55,6 @@ def send(span):
                                name = span.name,
                                parent_id = span.parent_id,
                                annotations = [annotation(n) for n in span.notes])
-    print "zspan is {0}".format(zspan)
     out = StringIO.StringIO()
     raw = TBinaryProtocol.TBinaryProtocolAccelerated(out)
     try:
@@ -69,4 +67,8 @@ def ip_to_i32(ip_str):
     """convert an ip address from a string to a signed 32-bit number"""
     return struct.unpack('!i', socket.inet_aton(ip_str))[0]
 
-
+def port_to_i16(port_num):
+    """conver a port number to a signed 16-bit int"""
+    if port_num > 2**15:
+        port_num -= 2**16
+    return port_num
