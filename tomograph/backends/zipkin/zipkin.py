@@ -21,10 +21,10 @@ from tomograph import cache
 
 import base64
 import StringIO
-import IPy
 import time
 import random
 import socket
+import struct
 import sys
 import traceback
 import atexit
@@ -67,9 +67,6 @@ def send(span):
 
 def ip_to_i32(ip_str):
     """convert an ip address from a string to a signed 32-bit number"""
-    a = -0x80000000 + (IPy.IP(ip_str).int() & 0x7fffffff)
-    if not -2147483648 <= a <= 2147483647:
-        print "ARGARG {0}".format(a)
-    return a
+    return struct.unpack('!i', socket.inet_aton(ip_str))[0]
 
 
