@@ -104,6 +104,7 @@ def before_execute(name):
         #print >>sys.stderr, 'connection is {0}:{1}'.format(h, port)
         #print >>sys.stderr, 'sql statement is {0}'.format(clauseelement)
         start(str(name) + 'db client', 'execute', h, port)
+        annotate(str(clauseelement))
     return handler
 
 def after_execute(name):
