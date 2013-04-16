@@ -93,6 +93,8 @@ def traced(service_name, name, host='0.0.0.0', port=0):
 ## sqlalchemy event listeners 
 def before_execute(name):
     def handler(conn, clauseelement, multiparams, params):
+        if not config.db_tracing_enabled:
+            return
         h = str(conn.connection.connection)
         a = h.find("'")
         b = h.find("'", a+1)
@@ -110,6 +112,8 @@ def before_execute(name):
 def after_execute(name):
     # name isn't used, at least not yet...
     def handler(conn, clauseelement, multiparams, params, result):
+        if not config.db_tracing_enabled:
+            return
         stop('execute')
         pass
     return handler

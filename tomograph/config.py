@@ -29,6 +29,7 @@ zipkin_max_queue_length = 50000
 zipkin_target_write_size = 1000
 
 debug = False
+db_tracing_enabled = True
 
 def set_backends(backends):
     """
