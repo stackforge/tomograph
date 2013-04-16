@@ -8,12 +8,14 @@
 # OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
+import eventlet
 
 from tomograph import config
 from tomograph import cache
 
-import logging
-import socket
+logging = eventlet.import_patched('logging')
+socket = eventlet.import_patched('socket')
+threading = eventlet.import_patched('threading')
 
 logger = logging.getLogger(__name__)
 
@@ -21,12 +23,15 @@ udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 hostname_cache = cache.Cache(socket.gethostbyname)
 
+lock = threading.Lock()
+
 def send(span):
 
     def statsd_send(name, value, units):
         stat = str(name).replace(' ', '-') + ':' + str(int(value)) + '|' + str(units)
         #logger.info('sending stat {0}'.format(stat))
-        udp_socket.sendto(stat, (hostname_cache.get(config.statsd_host), config.statsd_port))
+        with lock:
+            udp_socket.sendto(stat, (hostname_cache.get(config.statsd_host), config.statsd_port))
     
     def server_name(note):
         address = note.address.replace('.', '-')
