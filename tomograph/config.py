@@ -21,7 +21,7 @@ backend_modules = []
 zipkin_host = '127.0.0.1'
 zipkin_port = 1463
 
-statsd_host = 'pairsscares.corp.gq1.yahoo.com'
+statsd_host = '127.0.0.1'
 statsd_port = 8125
 
 zipkin_socket_timeout = 5.0
