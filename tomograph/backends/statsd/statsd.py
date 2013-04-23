@@ -29,9 +29,12 @@ def send(span):
 
     def statsd_send(name, value, units):
         stat = str(name).replace(' ', '-') + ':' + str(int(value)) + '|' + str(units)
-        #logger.info('sending stat {0}'.format(stat))
         with lock:
-            udp_socket.sendto(stat, (hostname_cache.get(config.statsd_host), config.statsd_port))
+            try:
+                udp_socket.sendto(stat, (hostname_cache.get(config.statsd_host), config.statsd_port))
+            except Exception:
+                if config.debug:
+                    logger.warning("Error sending metric to statsd.", exc_info=True)
     
     def server_name(note):
         address = note.address.replace('.', '-')
@@ -46,6 +49,4 @@ def send(span):
     # a count stat for each note
     for note in span.notes:
         stat_name = server_name(note) + '.' + span.name + '.' + str(note.value)
-        #print "before"
         statsd_send(stat_name, 1, 'c')
-        #print "after"

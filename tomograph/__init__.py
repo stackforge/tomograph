@@ -9,15 +9,20 @@
 # License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 
-from tomograph import *
-import config
+### Initialize logging in case it hasn't been done.  We need two
+### versions of this, one for the eventlet logging module and one for
+### the non-eventlet one...
 import logging
+import sys
+import eventlet
+eventlet_logging = eventlet.import_patched('logging')
+eventlet_sys = eventlet.import_patched('sys')
 
-def _initLogging():
+def _initLogging(logging, sys):
     """
     set up some default stuff, in case nobody configured logging yet
     """
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger('tomograph')
 
     if logger.level == logging.NOTSET:
         logger.setLevel(logging.INFO)
@@ -27,4 +32,8 @@ def _initLogging():
                 '%(asctime)s %(levelname)s %(name)s %(message)s'))
         logger.addHandler(handler)
 
-_initLogging()        
+_initLogging(logging, sys)
+_initLogging(eventlet_logging, eventlet_sys)
+
+import config
+from tomograph import *

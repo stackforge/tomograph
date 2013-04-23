@@ -51,10 +51,10 @@ def stop(name):
     annotate('stop')
     span = span_stack.spans.pop()
     assert span.name == name, 'start span name {0} not equal to end span name {1}'.format(span.name, name)
-    for backend in config.get_backends():
-        backend.send(span)
     if not span_stack.spans:
         del(span_stack.trace_id)
+    for backend in config.get_backends():
+        backend.send(span)
 
 def annotate(value, service_name=None, address=None, port=None):
     last_span = span_stack.spans[-1]
