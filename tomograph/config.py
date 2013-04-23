@@ -19,7 +19,7 @@ enabled_backends = ['tomograph.backends.zipkin',
 backend_modules = []
 
 zipkin_host = '127.0.0.1'
-zipkin_port = 1463
+zipkin_port = 9410
 
 statsd_host = '127.0.0.1'
 statsd_port = 8125
