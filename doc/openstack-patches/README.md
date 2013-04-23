@@ -18,7 +18,20 @@ Tracing Openstack with Tomograph
     cd glance; patch -p1 < tomograph/doc/openstack-patches/glance-stable-folsom.patch
     cd glance-client; patch -p1 < tomograph/doc/openstack-patches/glance-client-stable-folsom.patch
 
-4. Restart Openstack and boot a VM.  You should see log messages from the tomograph logging backend:
+4. Modify the paste config for glance-registry to include the tomograph middleware:
+
+    # in glance-registry-paste.ini:
+    [pipeline:glance-registry]
+    pipeline = tomo unauthenticated-context registryapp
+
+    [pipeline:glance-registry-keystone]
+    pipeline = tomo authtoken context registryapp
+
+    [filter:tomo]
+    paste.filter_factory = tomograph:Middleware.factory
+    service_name = glance-registry
+
+5. Restart Openstack and boot a VM.  You should see log messages from the tomograph logging backend:
 
     2013-04-18 02:02:08,797 INFO tomograph.backends.log Span(trace_id=5731049070570866, parent_id=None, ...
 
