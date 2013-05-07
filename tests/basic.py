@@ -18,8 +18,11 @@ import time
 
 @tomograph.traced('test server', 'server response', port=80)
 def server(latency):
+    tomograph.annotate('this is an annotation')
     time.sleep(latency)
-
+    tomograph.tag('this is double', 1.1)
+    tomograph.tag('this is a string', 'foo')
+    tomograph.tag('this is an int', 42)
 
 @tomograph.traced('test client', 'client request')
 def client(client_overhead, server_latency):

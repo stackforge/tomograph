@@ -48,15 +48,37 @@ def send(span):
     def annotation(note):
         return zipkin_thrift.Annotation(timestamp = int(note.time * 1e6),
                                         value = note.value,
+                                        duration = note.duration,
                                         host = endpoint(note))
+
+    def binary_annotation(dimension):
+        if isinstance(dimension.value, str):
+            tag_type = zipkin_thrift.AnnotationType.STRING
+            val = dimension.value
+        elif isinstance(dimension.value, float):
+            tag_type = zipkin_thrift.AnnotationType.DOUBLE
+            val = struct.pack('>d', dimension.value)
+            print "encoding double"
+        elif isinstance(dimension.value, int):
+            tag_type = zipkin_thrift.AnnotationType.I64
+            val = struct.pack('>q', dimension.value)
+        else:
+            raise RuntimeError("unsupported tag type")
+        return zipkin_thrift.BinaryAnnotation(key = dimension.key,
+                                              value = val,
+                                              annotation_type = tag_type,
+                                              host = endpoint(dimension))
 
     zspan = zipkin_thrift.Span(trace_id = span.trace_id,
                                id = span.id,
                                name = span.name,
                                parent_id = span.parent_id,
-                               annotations = [annotation(n) for n in span.notes])
+                               annotations = [annotation(n) for n in span.notes],
+                               binary_annotations = \
+                                   [binary_annotation(d) for d in span.dimensions])
     out = StringIO.StringIO()
-    raw = TBinaryProtocol.TBinaryProtocolAccelerated(out)
+    #raw = TBinaryProtocol.TBinaryProtocolAccelerated(out)
+    raw = TBinaryProtocol.TBinaryProtocol(out)
     try:
         zspan.write(raw)
     except OverflowError:

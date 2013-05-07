@@ -10,12 +10,12 @@
 # limitations under the License. See accompanying LICENSE file.
 
 import config
+from types import Span, Note, Tag
 
 import random
 import sys
 import time
 from eventlet import corolocal
-from collections import namedtuple
 import socket
 import pickle
 import base64
@@ -23,9 +23,6 @@ import logging
 import webob.dec
 
 span_stack = corolocal.local()
-
-Span = namedtuple('Span', 'trace_id parent_id id name notes')
-Note = namedtuple('Note', 'time value service_name address port')
 
 def start(service_name, name, address, port, trace_info=None):
     parent_id = None
@@ -40,7 +37,7 @@ def start(service_name, name, address, port, trace_info=None):
             parent_id = trace_info[1]
         span_stack.spans = []
 
-    span = Span(trace_id, parent_id, getId(), name, [])
+    span = Span(trace_id, parent_id, getId(), name, [], [])
     span_stack.spans.append(span)
     annotate('start', service_name, address, port)
 
@@ -56,15 +53,35 @@ def stop(name):
     for backend in config.get_backends():
         backend.send(span)
 
-def annotate(value, service_name=None, address=None, port=None):
-    last_span = span_stack.spans[-1]
+def annotate(value, service_name=None, address=None, port=None, duration=None):
+    """add an annotation at a particular point in time (with an optional duration)"""
+    cur_span = span_stack.spans[-1]
+    # attempt to default some values
     if service_name is None:
-        last_note = last_span.notes[-1]
-        service_name = last_note.service_name
-        address = last_note.address
-        port = last_note.port
-    note = Note(time.time(), value, service_name, address, int(port))
+        service_name = cur_span.notes[0].service_name
+    if address is None:
+        address = cur_span.notes[0].address
+    if port is None:
+        port = cur_span.notes[0].port
+    if duration is None:
+        duration = 0
+    note = Note(time.time(), str(value), service_name, address, int(port),
+                int(duration))
     span_stack.spans[-1].notes.append(note)
+
+def tag(key, value, service_name=None, address=None, port=None):
+    """add a key/value tag to the current span.  values can be int,
+    float, or string."""
+    assert isinstance(value, str) or isinstance(value, int) or isinstance(value, float)
+    cur_span = span_stack.spans[-1]
+    if service_name is None:
+        service_name = cur_span.notes[0].service_name
+    if address is None:
+        address = cur_span.notes[0].address
+    if port is None:
+        port = cur_span.notes[0].port
+    tag = Tag(str(key), value, service_name, address, port)
+    span_stack.spans[-1].dimensions.append(tag)
     
 def getId():
     return random.randrange(sys.maxint >> 10)
@@ -106,7 +123,7 @@ def before_execute(name):
         #print >>sys.stderr, 'connection is {0}:{1}'.format(h, port)
         #print >>sys.stderr, 'sql statement is {0}'.format(clauseelement)
         start(str(name) + 'db client', 'execute', h, port)
-        annotate(str(clauseelement))
+        annotate(clauseelement)
     return handler
 
 def after_execute(name):
