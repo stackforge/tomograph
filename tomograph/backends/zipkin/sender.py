@@ -2,7 +2,7 @@ import eventlet
 
 socket = eventlet.import_patched('socket')
 time = eventlet.import_patched('time')
-scribe = eventlet.import_patched('scribe.scribe')
+scribe = eventlet.import_patched('tomograph.backends.zipkin.generated.scribe.scribe')
 TTransport = eventlet.import_patched('thrift.transport.TTransport')
 TSocket = eventlet.import_patched('thrift.transport.TSocket')
 collections = eventlet.import_patched('collections')
