@@ -29,7 +29,14 @@ import sys
 import traceback
 import atexit
 
-scribe_sender = sender.ScribeSender()
+scribe_sender = sender.ScribeSender(host=config.zipkin_host,
+                                    port=config.zipkin_port,
+                                    socket_timeout=config.zipkin_socket_timeout,
+                                    target_write_size=config.zipkin_target_write_size,
+                                    max_queue_length=config.zipkin_max_queue_length,
+                                    must_yield=config.zipkin_must_yield,
+                                    max_write_interval=config.zipkin_max_write_interval,
+                                    debug=config.zipkin_debug_scribe_sender)
 atexit.register(scribe_sender.close)
 
 hostname_cache = cache.Cache(socket.gethostbyname)
@@ -58,7 +65,6 @@ def send(span):
         elif isinstance(dimension.value, float):
             tag_type = zipkin_thrift.AnnotationType.DOUBLE
             val = struct.pack('>d', dimension.value)
-            print "encoding double"
         elif isinstance(dimension.value, int):
             tag_type = zipkin_thrift.AnnotationType.I64
             val = struct.pack('>q', dimension.value)

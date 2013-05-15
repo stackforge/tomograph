@@ -27,6 +27,9 @@ statsd_port = 8125
 zipkin_socket_timeout = 5.0
 zipkin_max_queue_length = 50000
 zipkin_target_write_size = 1000
+zipkin_max_write_interval = 1
+zipkin_must_yield = True
+zipkin_debug_scribe_sender=False
 
 debug = False
 db_tracing_enabled = True
