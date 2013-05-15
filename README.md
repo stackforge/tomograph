@@ -40,6 +40,7 @@ lowest level one is to call start, stop, and annotate yourself:
     tomograph.start('my service', 'a query', '127.0.0.1', 80)
     (...)
     tomograph.annotate('something happened')
+    tomograph.tag('key', 'value')
     (...)
     tomograph.stop('a query')
 
@@ -103,6 +104,7 @@ execution:
 
     sqlalchemy.event.listen(_ENGINE, 'before_execute', tomograph.before_execute('my app'))
     sqlalchemy.event.listen(_ENGINE, 'after_execute', tomograph.after_execute('my app'))
+    sqlalchemy.event.listen(_ENGINE, 'dbapi_error', tomograph.dbapi_error('my app'))
 
 
 Screenshots
