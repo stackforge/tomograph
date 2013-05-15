@@ -132,7 +132,14 @@ def after_execute(name):
         if not config.db_tracing_enabled:
             return
         stop('execute')
-        pass
+    return handler
+
+def dbapi_error(name):
+    def handler(conn, cursor, statement, parameters, context, exception):
+        if not config.db_tracing_enabled:
+            return
+        annotate('database exception {0}'.format(exception))
+        stop('execute')
     return handler
 
 ## http helpers
