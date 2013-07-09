@@ -33,6 +33,7 @@ zipkin_debug_scribe_sender=False
 
 debug = False
 db_tracing_enabled = True
+db_trace_as_spans = True
 
 def set_backends(backends):
     """
