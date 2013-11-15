@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Yahoo! Inc. All rights reserved.  
+# Copyright (c) 2012 Yahoo! Inc. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you
 # may not use this file except in compliance with the License. You may
 # obtain a copy of the License at
@@ -14,26 +14,27 @@
 ### the non-eventlet one...
 import logging
 import sys
+
 import eventlet
 eventlet_logging = eventlet.import_patched('logging')
 eventlet_sys = eventlet.import_patched('sys')
 
+
 def _initLogging(logging, sys):
-    """
-    set up some default stuff, in case nobody configured logging yet
-    """
+    """Set up some default stuff, in case nobody configured logging yet."""
     logger = logging.getLogger('tomograph')
 
     if logger.level == logging.NOTSET:
         logger.setLevel(logging.INFO)
     if not logger.handlers:
         handler = logging.StreamHandler(sys.stdout)
-        handler.setFormatter(logging.Formatter(
-                '%(asctime)s %(levelname)s %(name)s %(message)s'))
+        handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s '
+                                               '%(name)s %(message)s'))
         logger.addHandler(handler)
+
 
 _initLogging(logging, sys)
 _initLogging(eventlet_logging, eventlet_sys)
 
-import config
+from tomograph import config
 from tomograph import *
