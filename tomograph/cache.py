@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Yahoo! Inc. All rights reserved.  
+# Copyright (c) 2012 Yahoo! Inc. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you
 # may not use this file except in compliance with the License. You may
 # obtain a copy of the License at
@@ -11,6 +11,7 @@
 
 import threading
 
+
 class Cache(object):
     def __init__(self, thunk, size_limit=1000):
         self._map = {}
@@ -20,7 +21,7 @@ class Cache(object):
 
     def get(self, k):
         with self._lock:
-            if self._map.has_key(k):
+            if k in self._map:
                 return self._map[k]
             else:
                 while len(self._map) >= self._size_limit:
@@ -28,4 +29,3 @@ class Cache(object):
                 v = self._thunk(k)
                 self._map[k] = v
                 return v
-
