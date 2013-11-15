@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Yahoo! Inc. All rights reserved.  
+# Copyright (c) 2012 Yahoo! Inc. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you
 # may not use this file except in compliance with the License. You may
 # obtain a copy of the License at
@@ -9,8 +9,10 @@
 # License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 
-from collections import namedtuple
+import collections
 
-Span = namedtuple('Span', 'trace_id parent_id id name notes dimensions')
-Note = namedtuple('Note', 'time value service_name address port duration')
-Tag = namedtuple('Tag', 'key value service_name address port')
+Span = collections.namedtuple('Span', 'trace_id parent_id id name notes'
+                                      ' dimensions')
+Note = collections.namedtuple('Note', 'time value service_name'
+                                      ' address port duration')
+Tag = collections.namedtuple('Tag', 'key value service_name address port')

@@ -1,8 +1,20 @@
+# Copyright (c) 2012 Yahoo! Inc. All rights reserved.
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License. You may
+# obtain a copy of the License at
+# http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+# applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and
+# limitations under the License. See accompanying LICENSE file.
+
 import eventlet
 
 socket = eventlet.import_patched('socket')
 time = eventlet.import_patched('time')
-scribe = eventlet.import_patched('tomograph.backends.zipkin.generated.scribe.scribe')
+scribe = eventlet.import_patched('tomograph.backends.zipkin.'
+                                 'generated.scribe.scribe')
 TTransport = eventlet.import_patched('thrift.transport.TTransport')
 TSocket = eventlet.import_patched('thrift.transport.TSocket')
 collections = eventlet.import_patched('collections')
@@ -11,9 +23,10 @@ threading = eventlet.import_patched('threading')
 
 from thrift.protocol import TBinaryProtocol
 
+
 class ScribeSender(object):
-    def __init__(self, host='127.0.0.1', port=1463,debug=False,
-                 target_write_size=1000, max_write_interval=1.0, 
+    def __init__(self, host='127.0.0.1', port=1463, debug=False,
+                 target_write_size=1000, max_write_interval=1.0,
                  socket_timeout=5.0, max_queue_length=50000, must_yield=True):
         self.dropped = 0
         self._remote_host = host
@@ -35,13 +48,11 @@ class ScribeSender(object):
         self.flush()
 
     def send(self, category, msg):
-        """
-        Send one record to scribe.
-        """
+        """Send one record to scribe."""
         log_entry = scribe.LogEntry(category=category, message=msg)
         self._log_buffer.append(log_entry)
         self._dropMsgs()
-        
+
         now = time.time()
         if len(self._log_buffer) >= self._target_write_size or \
                 now - self._last_write > self._max_write_interval:
@@ -66,22 +77,24 @@ class ScribeSender(object):
                 buf.append(self._log_buffer.popleft())
             if buf:
                 if self._debug:
-                    print "ScribeSender: flushing {0} msgs".format(len(buf))
+                    print("ScribeSender: flushing {0} msgs".format(len(buf)))
                 try:
                     client = self._getClient()
                     result = client.Log(messages=buf)
                     if result == scribe.ResultCode.TRY_LATER:
                         dropped += len(buf)
-                except:
+                except Exception:
                     if self._debug:
-                        print "ScribeSender: caught exception writing log message:"
+                        print("ScribeSender: caught exception writing "
+                              "log message:")
                         traceback.print_exc()
                     dropped += len(buf)
         finally:
             self._lock.release()
             self.dropped += dropped
             if self._debug and dropped:
-                print "ScribeSender: dropped {0} messages for communication problem.".format(dropped)
+                print("ScribeSender: dropped {0} messages for "
+                      "communication problem.".format(dropped))
 
     def _dropMsgs(self):
         dropped = 0
@@ -90,7 +103,8 @@ class ScribeSender(object):
             dropped += 1
         self.dropped += dropped
         if self._debug and dropped:
-            print "ScribeSender: dropped {0} messages for queue length.".format(dropped)
+            print("ScribeSender: dropped {0} messages for queue "
+                  "length.".format(dropped))
 
     def _getClient(self):
         # We can't just keep a connection because the app might fork
@@ -102,4 +116,3 @@ class ScribeSender(object):
         transport.open()
         protocol = TBinaryProtocol.TBinaryProtocolAccelerated(transport)
         return scribe.Client(protocol)
-        

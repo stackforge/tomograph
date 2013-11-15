@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Yahoo! Inc. All rights reserved.
+# Copyright (c) 2013 Yahoo! Inc. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you
 # may not use this file except in compliance with the License. You may
 # obtain a copy of the License at
@@ -9,4 +9,17 @@
 # License for the specific language governing permissions and
 # limitations under the License. See accompanying LICENSE file.
 
-from zipkin import *
+TOMOGRAPH_VERSION = ['2013', '1', None]
+YEAR, COUNT, REVISION = TOMOGRAPH_VERSION
+FINAL = False  # May never be final ;)
+
+
+def canonical_version_string():
+    return '.'.join(filter(None, TOMOGRAPH_VERSION))
+
+
+def version_string():
+    if FINAL:
+        return canonical_version_string()
+    else:
+        return '%s-dev' % (canonical_version_string())

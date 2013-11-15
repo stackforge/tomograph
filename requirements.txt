@@ -1,4 +1,5 @@
-eventlet
 webob
 statsd
+eventlet
 thrift
+

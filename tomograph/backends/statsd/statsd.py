@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Yahoo! Inc. All rights reserved.  
+# Copyright (c) 2012 Yahoo! Inc. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you
 # may not use this file except in compliance with the License. You may
 # obtain a copy of the License at
@@ -10,8 +10,8 @@
 # limitations under the License. See accompanying LICENSE file.
 import eventlet
 
-from tomograph import config
 from tomograph import cache
+from tomograph import config
 
 logging = eventlet.import_patched('logging')
 socket = eventlet.import_patched('socket')
@@ -25,17 +25,22 @@ hostname_cache = cache.Cache(socket.gethostbyname)
 
 lock = threading.Lock()
 
+
 def send(span):
 
     def statsd_send(name, value, units):
-        stat = str(name).replace(' ', '-') + ':' + str(int(value)) + '|' + str(units)
+        stat = (str(name).replace(' ', '-') + ':' + str(int(value)) +
+                '|' + str(units))
         with lock:
             try:
-                udp_socket.sendto(stat, (hostname_cache.get(config.statsd_host), config.statsd_port))
+                udp_socket.sendto(stat,
+                                  (hostname_cache.get(config.statsd_host),
+                                   config.statsd_port))
             except Exception:
                 if config.debug:
-                    logger.warning("Error sending metric to statsd.", exc_info=True)
-    
+                    logger.warning("Error sending metric to statsd.",
+                                   exc_info=True)
+
     def server_name(note):
         address = note.address.replace('.', '-')
         return note.service_name + ' ' + address + ' ' + str(note.port)
