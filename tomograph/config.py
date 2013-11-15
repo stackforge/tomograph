@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Yahoo! Inc. All rights reserved.  
+# Copyright (c) 2012 Yahoo! Inc. All rights reserved.
 # Licensed under the Apache License, Version 2.0 (the "License"); you
 # may not use this file except in compliance with the License. You may
 # obtain a copy of the License at
@@ -29,17 +29,16 @@ zipkin_max_queue_length = 50000
 zipkin_target_write_size = 1000
 zipkin_max_write_interval = 1
 zipkin_must_yield = True
-zipkin_debug_scribe_sender=False
+zipkin_debug_scribe_sender = False
 
 debug = False
 db_tracing_enabled = True
 db_trace_as_spans = False
 
+
 def set_backends(backends):
-    """
-    Set the list of enabled backends.  Backend name should be the full
-    module name of the backend.  All backends must support a
-    send(span) method.
+    """Set the list of enabled backends. Backend name should be the full
+    module name of the backend. All backends must support a send(span) method.
     """
     global enabled_backends
     global backend_modules
@@ -53,11 +52,11 @@ def set_backends(backends):
                 module = getattr(module, submodule)
             backend_modules.append(module)
         except (ImportError, AttributeError, ValueError) as err:
-            raise RuntimeError('Could not load tomograph backend {0}: {1}'.format(
-                    backend, err))
+            raise RuntimeError('Could not load tomograph backend '
+                               '{0}: {1}'.format(backend, err))
+
 
 def get_backends():
     if not backend_modules:
         set_backends(enabled_backends)
     return backend_modules
-    
