@@ -1,3 +1,0 @@
-webob
-statsd
-

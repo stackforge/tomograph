@@ -1,5 +1,0 @@
-webob
-statsd
-eventlet
-thrift
-
